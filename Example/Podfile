@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'LCRNetServiceKit_Example' do
+  pod 'LCRNetServiceKit', :path => '../'
+
+  target 'LCRNetServiceKit_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
