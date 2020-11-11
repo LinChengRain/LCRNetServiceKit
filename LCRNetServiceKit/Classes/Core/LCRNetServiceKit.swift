@@ -17,11 +17,11 @@ public typealias ProgressResult =  (Double) -> Void//进度
 /// 状态码
 public typealias NetworkStatus = (_ LCNetworkStatus: Int32) -> Void
 
-@objc enum LCRNetServiceStatus: Int32 {
-    case  HttpUnknow       = -1  //未知
-    case  HttpNoReachable  = 0  // 无网络
-    case  HttpWwan         = 1   //2g ， 3g 4g
-    case  HttpWifi         = 2  // wifi
+@objc public enum LCRNetServiceStatus: Int32 {
+     case  HttpUnknow       = -1  //未知
+     case  HttpNoReachable  = 0  // 无网络
+     case  HttpWwan         = 1   //2g ， 3g 4g
+     case  HttpWifi         = 2  // wifi
 }
 
 ///  网络请求的类型
@@ -33,15 +33,38 @@ public enum LCRHttpRequestType {
 
 public class LCRNetServiceKit: NSObject {
     
-    private var request:DataRequest!
+    private var request:DataRequest?
     
     public static let shared = LCRNetServiceKit()
     
-    var networkStatus: LCRNetServiceStatus = LCRNetServiceStatus.HttpWifi
+    public var networkStatus: LCRNetServiceStatus = LCRNetServiceStatus.HttpWifi
 
 }
 
 extension LCRNetServiceKit{
+    
+    /// 取消网络
+    public func cancel() {
+        guard let request = self.request else { return }
+        request.cancel()
+    }
+    /// 取消所有请求
+    public func cancelAllRequests() {
+        AF.cancelAllRequests {
+            
+        }
+    }
+    /// 取消指定 url 的请求
+    public func cancel(_ url:String) {
+        AF.withAllRequests { (activeRequests) in
+            activeRequests.forEach {
+                //只取消指定url的请求
+                if ($0.request?.url?.absoluteString == url) {
+                    $0.cancel()
+                }
+            }
+        }
+    }
     
     ///  POST/GET
     ///
@@ -86,7 +109,7 @@ extension LCRNetServiceKit{
     ///   - fail: 失败回调
     private func postRequest(_ headers:HTTPHeaders? = nil,url:  String ,parameters: [String:Any]? = nil,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
         
-        AF.request(url, method: .post, parameters: parameters, headers: headers).responseJSON { [weak self] (response) in
+       request = AF.request(url, method: .post, parameters: parameters, headers: headers).responseJSON { [weak self] (response) in
             guard let self = self else { return }
             self.handleResponse(response: response, success: success, fail: fail)
         }
@@ -103,7 +126,7 @@ extension LCRNetServiceKit{
     
     private func getRequest(_ headers:HTTPHeaders?, url: String ,parameters: [String:Any]? = nil,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
         
-        AF.request(url, method: .get, parameters: parameters, headers: headers).responseJSON { [weak self] (response) in
+        request = AF.request(url, method: .get, parameters: parameters, headers: headers).responseJSON { [weak self] (response) in
             guard let self = self else { return }
             self.handleResponse(response: response, success: success, fail: fail)
         }
@@ -129,7 +152,7 @@ extension LCRNetServiceKit{
         print("调用接口:\(url)")
         // 配置header
         let  headers :HTTPHeaders? = signAndToken(headerParams)
-        AF.upload(multipartFormData: { (multipartFormData) in
+        request = AF.upload(multipartFormData: { (multipartFormData) in
             /** 采用post表单上传,参数解释：
              *  withName:和后台服务器的name要一致;
              *  fileName:可以充分利用写成用户的id，但是格式要写对;
@@ -159,7 +182,7 @@ extension LCRNetServiceKit{
     public func uploadVideo( url:String ,parameters: [String:Any]? = nil, video: Data,fileName:String?, headerParams:String?,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
         
         let  headers :HTTPHeaders? = signAndToken(headerParams)
-        AF.upload(multipartFormData: { (multipartFormData) in
+        request = AF.upload(multipartFormData: { (multipartFormData) in
             /** 采用post表单上传,参数解释：
              *  withName:和后台服务器的name要一致;
              *  fileName:可以充分利用写成用户的id，但是格式要写对;
@@ -182,8 +205,6 @@ extension LCRNetServiceKit{
             success(value as AnyObject)
         case .failure(let error):
             fail(error as AnyObject)
-        default:
-            break
         }
     }
     
@@ -195,9 +216,4 @@ extension LCRNetServiceKit{
         return ["Authorization":headerParams!];
     }
     
-    /// 取消网络
-    func cancel() {
-        guard let request = self.request else { return }
-        request.cancel()
-    }
 }
