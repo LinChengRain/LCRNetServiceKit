@@ -32,12 +32,12 @@ TODO: Add long description of the pod here.
   s.source_files = 'LCRNetServiceKit/Classes/**/*'
   
   s.swift_versions = ['5.0','5.1','5.2']
-  s.platform = :ios
+  s.platform = :ios,'10.0'
   # s.resource_bundles = {
   #   'LCRNetServiceKit' => ['LCRNetServiceKit/Assets/*.png']
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'Alamofire', '~> 5.2'
+  s.dependency 'Alamofire', '~> 5.0'
 end
