@@ -17,7 +17,7 @@ public typealias ProgressResult =  (Double) -> Void//进度
 /// 状态码
 public typealias NetworkStatus = (_ LCNetworkStatus: Int32) -> Void
 
-@objc public enum LCRNetServiceStatus: Int32 {
+public enum LCRNetServiceStatus: Int32 {
      case  HttpUnknow       = -1  //未知
      case  HttpNoReachable  = 0  // 无网络
      case  HttpWwan         = 1   //2g ， 3g 4g
@@ -81,10 +81,10 @@ extension LCRNetServiceKit{
             return;
         }
         
-        if let parameter = parameters {
-            print("请求参数:\(parameter)")
-        }
-        print("调用接口:\(url)")
+//        if let parameter = parameters {
+//            print("请求参数:\(parameter)")
+//        }
+//        print("调用接口:\(url)")
         // 配置header
         let  headers :HTTPHeaders? = signAndToken(headerParams)
         
@@ -149,7 +149,6 @@ extension LCRNetServiceKit{
         if url.isEmpty || url.count <= 0  {
             return;
         }
-        print("调用接口:\(url)")
         // 配置header
         let  headers :HTTPHeaders? = signAndToken(headerParams)
         request = AF.upload(multipartFormData: { (multipartFormData) in
@@ -160,7 +159,7 @@ extension LCRNetServiceKit{
              */
             multipartFormData.append(imageData, withName: "file",fileName: "image.jpg",mimeType: "image/jpg")
         }, to: url,headers: headers).uploadProgress { (progress) in
-            print("Upload Progress: \(progress.fractionCompleted)")
+//            print("Upload Progress: \(progress.fractionCompleted)")
             progressBlock(progress.fractionCompleted);
         }.responseJSON { (response) in
             self.handleResponse(response: response, success: success, fail: fail)
@@ -190,7 +189,6 @@ extension LCRNetServiceKit{
              */
             multipartFormData.append(video, withName: fileName ?? "file", fileName: "video.mp4", mimeType: "video/mp4")
         }, to: url,headers: headers).uploadProgress { (progress) in
-            print("Upload Progress: \(progress.fractionCompleted)")
             progressBlock(progress.fractionCompleted);
         }.responseJSON { (response) in
             self.handleResponse(response: response, success: success, fail: fail)
