@@ -11,7 +11,7 @@ import Alamofire
 /// 宏定义请求成功的block
 public typealias ResponseSuccess = (_ response: AnyObject) -> Void
 /// 宏定义请求失败的block
-public typealias ResponseFail = (_ error: AnyObject) -> Void
+public typealias ResponseFailure = (_ error: AnyObject) -> Void
 /// 上传或者下载的进度
 public typealias ProgressResult =  (Double) -> Void//进度
 /// 状态码
@@ -74,8 +74,8 @@ extension LCRNetServiceKit{
     ///   - url: 请求网址路径
     ///   - params:  请求参数
     ///   - success: 成功回调
-    ///   - fail: 失败回调
-    public func requestData(requestType: LCRHttpRequestType = .Post,headerParams: String? = nil, url:  String ,parameters: [String:Any]? = nil,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
+    ///   - failure: 失败回调
+    public func requestData(requestType: LCRHttpRequestType = .Post,headerParams: String? = nil, url:  String ,parameters: [String:Any]?,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
         if url.isEmpty || url.count <= 0  {
             return;
@@ -91,11 +91,11 @@ extension LCRNetServiceKit{
         // 配置请求方式
         switch requestType {
         case .Get:
-            self.getRequest(headers,url: url, parameters: parameters, success: success, fail: fail)
+            self.getRequest(headers,url: url, parameters: parameters, success: success, failure: failure)
         case .Post:
-            self.postRequest(headers,url: url, parameters: parameters, success: success, fail: fail)
+            self.postRequest(headers,url: url, parameters: parameters, success: success, failure: failure)
         case .JsonPost:
-            self.postRequest(headers,url: url, parameters: parameters, success: success, fail: fail)
+            self.postRequest(headers,url: url, parameters: parameters, success: success, failure: failure)
         }
     }
     
@@ -106,12 +106,12 @@ extension LCRNetServiceKit{
     ///   - url: 请求网址路径
     ///   - parameters:  请求参数
     ///   - success: 成功回调
-    ///   - fail: 失败回调
-    private func postRequest(_ headers:HTTPHeaders? = nil,url:  String ,parameters: [String:Any]? = nil,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
+    ///   - failure: 失败回调
+    private func postRequest(_ headers:HTTPHeaders? = nil,url:  String ,parameters: [String:Any]? = nil,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
-       request = AF.request(url, method: .post, parameters: parameters, headers: headers).responseJSON { [weak self] (response) in
+        request = AF.request(url, method: .post, parameters: parameters,encoding: JSONEncoding.default, headers: headers).responseJSON { [weak self] (response) in
             guard let self = self else { return }
-            self.handleResponse(response: response, success: success, fail: fail)
+            self.handleResponse(response: response, success: success, failure: failure)
         }
     }
     
@@ -122,13 +122,13 @@ extension LCRNetServiceKit{
     ///   - url: 请求网址路径
     ///   - parameters:  请求参数
     ///   - success: 成功回调
-    ///   - fail: 失败回调
+    ///   - failure: 失败回调
     
-    private func getRequest(_ headers:HTTPHeaders?, url: String ,parameters: [String:Any]? = nil,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
+    private func getRequest(_ headers:HTTPHeaders?, url: String ,parameters: [String:Any]? = nil,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
         request = AF.request(url, method: .get, parameters: parameters, headers: headers).responseJSON { [weak self] (response) in
             guard let self = self else { return }
-            self.handleResponse(response: response, success: success, fail: fail)
+            self.handleResponse(response: response, success: success, failure: failure)
         }
     }
     
@@ -143,8 +143,8 @@ extension LCRNetServiceKit{
     ///   - headers: 响应头参数
     ///   - progressBlock: 进度
     ///   - success: 成功回调
-    ///   - fail: 失败回调
-    public func uploadImage(url:String ,parameters: [String:Any]? = nil, imageData: Data,fileName:String?, headerParams:String? = nil,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
+    ///   - failure: 失败回调
+    public func uploadImage(url:String ,parameters: [String:Any]? = nil, imageData: Data,fileName:String?, headerParams:String? = nil,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
         if url.isEmpty || url.count <= 0  {
             return;
@@ -162,7 +162,7 @@ extension LCRNetServiceKit{
 //            print("Upload Progress: \(progress.fractionCompleted)")
             progressBlock(progress.fractionCompleted);
         }.responseJSON { (response) in
-            self.handleResponse(response: response, success: success, fail: fail)
+            self.handleResponse(response: response, success: success, failure: failure)
         }
     }
     
@@ -177,8 +177,8 @@ extension LCRNetServiceKit{
     ///   - headers: 响应头参数
     ///   - progressBlock: 进度
     ///   - success: 成功回调
-    ///   - fail: 失败回调
-    public func uploadVideo( url:String ,parameters: [String:Any]? = nil, video: Data,fileName:String?, headerParams:String?,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,fail: @escaping ResponseFail){
+    ///   - failure: 失败回调
+    public func uploadVideo( url:String ,parameters: [String:Any]? = nil, video: Data,fileName:String?, headerParams:String?,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
         let  headers :HTTPHeaders? = signAndToken(headerParams)
         request = AF.upload(multipartFormData: { (multipartFormData) in
@@ -191,27 +191,29 @@ extension LCRNetServiceKit{
         }, to: url,headers: headers).uploadProgress { (progress) in
             progressBlock(progress.fractionCompleted);
         }.responseJSON { (response) in
-            self.handleResponse(response: response, success: success, fail: fail)
+            self.handleResponse(response: response, success: success, failure: failure)
         }
     }
     
     // MARK: - 处理响应
-    private func handleResponse(response:AFDataResponse<Any>,success:@escaping ResponseSuccess,fail:@escaping ResponseFail){
+    private func handleResponse(response:AFDataResponse<Any>,success:@escaping ResponseSuccess,failure:@escaping ResponseFailure){
 
         switch response.result {
         case .success(let value):
             success(value as AnyObject)
         case .failure(let error):
-            fail(error as AnyObject)
+            failure(error as AnyObject)
         }
     }
     
     // MARK: - 设置请求头
     private func signAndToken(_ headerParams:String?) -> HTTPHeaders?{
         
-        guard headerParams != nil else { return nil }
-//        print("header:\(headerParams ?? "")")
-        return ["Authorization":headerParams!];
+        guard let params = headerParams else {
+            return ["Accept": "application/json"]
+        }
+        return ["Authorization":params,
+                "Accept": "application/json"
+        ];
     }
-    
 }

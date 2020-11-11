@@ -1,6 +1,6 @@
 PODS:
   - Alamofire (5.4.0)
-  - LCRNetServiceKit (0.1.0):
+  - LCRNetServiceKit (0.1.11):
     - Alamofire (~> 5.0)
 
 DEPENDENCIES:
@@ -16,7 +16,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 3b6a534a3df22db367e4dedeeca73d1ddfcf0e2f
-  LCRNetServiceKit: 2d25f84be4bddb4fe7cdb543965a5bffd1520cc6
+  LCRNetServiceKit: 07b9db63cf0c984cd3141d5ccb464cb8bc23b039
 
 PODFILE CHECKSUM: d561d2b3445d33ee00f2d6a20e50d7e7e8de27e5
 

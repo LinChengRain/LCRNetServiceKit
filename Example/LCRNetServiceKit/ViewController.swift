@@ -12,9 +12,10 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        LCRNetServiceKit.shared.requestData(url: "http://47.99.76.125:8091/api/learn/home/inviteBanner") { (response) in
+
+        LCRNetServiceKit.shared.requestData(requestType: .Post, headerParams: nil, url: "http://47.99.76.125:8091/api/learn/home/randomBook1", parameters: [String:Any]()) { (response) in
             
-        } fail: { (AnyObject) in
+        } failure: { (AnyObject) in
             
         }
 
