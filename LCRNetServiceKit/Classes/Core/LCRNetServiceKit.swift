@@ -14,8 +14,6 @@ public typealias ResponseSuccess = (_ response: AnyObject) -> Void
 public typealias ResponseFailure = (_ error: AnyObject) -> Void
 /// 上传或者下载的进度
 public typealias ProgressResult =  (Double) -> Void//进度
-/// 状态码
-public typealias NetworkStatus = (_ LCNetworkStatus: Int32) -> Void
 
 public enum LCRNetServiceStatus: Int32 {
      case  HttpUnknow       = -1  //未知
@@ -36,12 +34,35 @@ public class LCRNetServiceKit: NSObject {
     private var request:DataRequest?
     
     public static let shared = LCRNetServiceKit()
-    
+    /// 网络状态
     public var networkStatus: LCRNetServiceStatus = LCRNetServiceStatus.HttpWifi
 
 }
 
 extension LCRNetServiceKit{
+    
+    /// 网络监听
+    public func listenerForReachability() {
+        
+        NetworkReachabilityManager.default?.startListening(onUpdatePerforming: { (reachabilityStatus) in
+            switch reachabilityStatus {
+            case .notReachable:
+                print("Not reachable")
+                self.networkStatus = .HttpNoReachable
+            case .unknown:
+                print("Not unknown")
+                self.networkStatus = .HttpUnknow
+            case .reachable(let type):
+                if type == .ethernetOrWiFi {
+                    print("Reachable via WiFi")
+                    self.networkStatus = .HttpWifi
+                } else if type == .cellular {
+                    print("Reachable via Cellular")
+                    self.networkStatus = .HttpWwan
+                }
+            }
+        })
+    }
     
     /// 取消网络
     public func cancel() {
@@ -81,10 +102,6 @@ extension LCRNetServiceKit{
             return;
         }
         
-//        if let parameter = parameters {
-//            print("请求参数:\(parameter)")
-//        }
-//        print("调用接口:\(url)")
         // 配置header
         let  headers :HTTPHeaders? = signAndToken(headerParams)
         

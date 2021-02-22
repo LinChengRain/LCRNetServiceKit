@@ -19,6 +19,7 @@ class ViewController: UIViewController {
             
         }
 
+        LCRNetServiceKit.shared.listenerForReachability()
 
         // Do any additional setup after loading the view, typically from a nib.
     }
