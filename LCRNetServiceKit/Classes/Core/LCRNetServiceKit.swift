@@ -8,6 +8,7 @@
 
 import UIKit
 import Alamofire
+import Reachability
 /// 宏定义请求成功的block
 public typealias ResponseSuccess = (_ response: AnyObject) -> Void
 /// 宏定义请求失败的block
@@ -31,37 +32,61 @@ public enum LCRHttpRequestType {
 
 public class LCRNetServiceKit: NSObject {
     
-    private var request:DataRequest?
+    public static let ReceiveNetworkStatusChange = Notification.Name(rawValue: "ReceiveNetworkStatusChange")
+
+    fileprivate var request:DataRequest?
+    
+    fileprivate let reachability = try! Reachability()
     
     public static let shared = LCRNetServiceKit()
+   
     /// 网络状态
-    public var networkStatus: LCRNetServiceStatus = LCRNetServiceStatus.HttpWifi
+    public var networkStatus: LCRNetServiceStatus = LCRNetServiceStatus.HttpWwan {
+        didSet {
+            NotificationCenter.default.post(name: LCRNetServiceKit.ReceiveNetworkStatusChange, object: networkStatus)
+        }
+    }
+    
 
+    /// 是否开启网络监听
+    public var isListener:Bool = false {
+        didSet {
+            /// 不开启
+            if !isListener {
+                /// 关闭监听
+                reachability.stopNotifier()
+            } else {
+                listenerForReachability()
+            }
+        }
+    }
 }
 
 extension LCRNetServiceKit{
     
     /// 网络监听
-    public func listenerForReachability() {
+    fileprivate func listenerForReachability() {
         
-        NetworkReachabilityManager.default?.startListening(onUpdatePerforming: { (reachabilityStatus) in
-            switch reachabilityStatus {
-            case .notReachable:
-                print("Not reachable")
-                self.networkStatus = .HttpNoReachable
-            case .unknown:
-                print("Not unknown")
-                self.networkStatus = .HttpUnknow
-            case .reachable(let type):
-                if type == .ethernetOrWiFi {
-                    print("Reachable via WiFi")
-                    self.networkStatus = .HttpWifi
-                } else if type == .cellular {
-                    print("Reachable via Cellular")
-                    self.networkStatus = .HttpWwan
-                }
+        reachability.whenReachable = { reachability in
+            if reachability.connection == .wifi {
+                print("Reachable via WiFi")
+                self.networkStatus = .HttpWifi
+            } else {
+                print("Reachable via Cellular")
+                self.networkStatus = .HttpWwan
             }
-        })
+        }
+        
+        reachability.whenUnreachable = { _ in
+            print("Not reachable")
+            self.networkStatus = .HttpNoReachable
+        }
+        
+        do {
+            try reachability.startNotifier()
+        } catch {
+            print("Unable to start notifier")
+        }
     }
     
     /// 取消网络

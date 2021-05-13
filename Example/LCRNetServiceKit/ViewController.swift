@@ -14,12 +14,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         LCRNetServiceKit.shared.requestData(requestType: .Post, headerParams: nil, url: "http://47.99.76.125:8091/api/learn/home/randomBook1", parameters: [String:Any]()) { (response) in
-            
+            print("success")
         } failure: { (AnyObject) in
-            
+            print("false")
         }
 
-        LCRNetServiceKit.shared.listenerForReachability()
+        LCRNetServiceKit.shared.isListener = false
 
         // Do any additional setup after loading the view, typically from a nib.
     }
