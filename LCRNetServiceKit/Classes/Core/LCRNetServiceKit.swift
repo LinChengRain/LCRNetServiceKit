@@ -121,7 +121,7 @@ extension LCRNetServiceKit{
     ///   - params:  请求参数
     ///   - success: 成功回调
     ///   - failure: 失败回调
-    public func requestData(requestType: LCRHttpRequestType = .Post,headerParams: String? = nil, url:  String ,parameters: [String:Any]?,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
+    public func requestData(requestType: LCRHttpRequestType = .Post,headerParams: [String:String]? = nil, url:  String ,parameters: [String:Any]?,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
         if url.isEmpty || url.count <= 0  {
             return;
@@ -186,7 +186,7 @@ extension LCRNetServiceKit{
     ///   - progressBlock: 进度
     ///   - success: 成功回调
     ///   - failure: 失败回调
-    public func uploadImage(url:String ,parameters: [String:Any]? = nil, imageData: Data,fileName:String?, headerParams:String? = nil,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
+    public func uploadImage(url:String ,parameters: [String:Any]? = nil, imageData: Data,fileName:String?, headerParams:[String:String]? = nil,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
         if url.isEmpty || url.count <= 0  {
             return;
@@ -220,7 +220,7 @@ extension LCRNetServiceKit{
     ///   - progressBlock: 进度
     ///   - success: 成功回调
     ///   - failure: 失败回调
-    public func uploadVideo( url:String ,parameters: [String:Any]? = nil, video: Data,fileName:String?, headerParams:String?,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
+    public func uploadVideo( url:String ,parameters: [String:Any]? = nil, video: Data,fileName:String?, headerParams:[String:String]?,progressBlock:@escaping ProgressResult,success:@escaping ResponseSuccess,failure: @escaping ResponseFailure){
         
         let  headers :HTTPHeaders? = signAndToken(headerParams)
         request = AF.upload(multipartFormData: { (multipartFormData) in
@@ -249,13 +249,18 @@ extension LCRNetServiceKit{
     }
     
     // MARK: - 设置请求头
-    private func signAndToken(_ headerParams:String?) -> HTTPHeaders?{
+    private func signAndToken(_ headerParams:[String:String]?) -> HTTPHeaders?{
         
         guard let params = headerParams else {
             return ["Accept": "application/json"]
         }
-        return ["Authorization":params,
-                "Accept": "application/json"
-        ];
+        /// 请求头
+        var header:HTTPHeaders = []
+        header.add(name: "Accept", value: "application/json")
+        /// 添加自定义参数
+        for (key,value) in params {
+            header.add(name: key, value: value)
+        }
+        return header;
     }
 }

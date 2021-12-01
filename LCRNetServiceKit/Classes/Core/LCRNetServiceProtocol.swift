@@ -16,7 +16,7 @@ public protocol LCRApiServiceProtocol {
     /// API additional information, eg: Author | Note...
     var extra: String? { get }
     /// API header
-    var header: String? { get }
+    var header: [String:String]? { get }
     /// Type representing HTTP methods.
     var method: LCRHttpRequestType { get }
 }

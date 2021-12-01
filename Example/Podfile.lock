@@ -1,8 +1,8 @@
 PODS:
   - Alamofire (5.4.0)
-  - LCRNetServiceKit (0.1.13):
+  - LCRNetServiceKit (0.1.14):
     - Alamofire (~> 5.0)
-    - ReachabilitySwift
+    - ReachabilitySwift (~> 5.0.0)
   - ReachabilitySwift (5.0.0)
 
 DEPENDENCIES:
@@ -19,7 +19,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 3b6a534a3df22db367e4dedeeca73d1ddfcf0e2f
-  LCRNetServiceKit: 6c09d51be93d7b9e990ddf15f00ed4744ab36a03
+  LCRNetServiceKit: 31a34296bf5fb7316d2a589ba223d10b934de1e8
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
 
 PODFILE CHECKSUM: d561d2b3445d33ee00f2d6a20e50d7e7e8de27e5
