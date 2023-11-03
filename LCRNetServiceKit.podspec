@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'LCRNetServiceKit'
-  s.version          = '0.1.14'
+  s.version          = '0.1.15'
   s.summary          = 'A short description of LCRNetServiceKit.'
 
 # This description is used to generate tags and improve search results.
@@ -28,18 +28,18 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/LinChengRain/LCRNetServiceKit.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '12.0'
   s.source_files = 'LCRNetServiceKit/Classes/**/*'
   
-  s.swift_versions = ['5.0','5.1','5.2']
-  s.platform = :ios,'10.0'
+  s.swift_versions = '5.2'
+  s.platform = :ios,'12.0'
   # s.resource_bundles = {
   #   'LCRNetServiceKit' => ['LCRNetServiceKit/Assets/*.png']
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'Alamofire', '~> 5.0'
+  s.dependency 'Alamofire', '~> 5.8.0'
   s.dependency 'ReachabilitySwift', '~> 5.0.0'
 
 end
