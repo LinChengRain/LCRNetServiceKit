@@ -1,9 +1,9 @@
 PODS:
-  - Alamofire (5.8.1)
-  - LCRNetServiceKit (0.1.15):
-    - Alamofire (~> 5.8.0)
-    - ReachabilitySwift (~> 5.0.0)
-  - ReachabilitySwift (5.0.0)
+  - Alamofire (5.10.2)
+  - LCRNetServiceKit (0.1.16):
+    - Alamofire (~> 5.10.2)
+    - ReachabilitySwift (~> 5.2.4)
+  - ReachabilitySwift (5.2.4)
 
 DEPENDENCIES:
   - LCRNetServiceKit (from `../`)
@@ -18,10 +18,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: 3ca42e259043ee0dc5c0cdd76c4bc568b8e42af7
-  LCRNetServiceKit: 2ba050cb4c36e77a79a2ec8b6f62ce4bb6d0f4da
-  ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
+  Alamofire: 7193b3b92c74a07f85569e1a6c4f4237291e7496
+  LCRNetServiceKit: 661aecb346d5e708c67cea315e212d2ab114e469
+  ReachabilitySwift: 32793e867593cfc1177f5d16491e3a197d2fccda
 
 PODFILE CHECKSUM: fe248008aad2d758624aa681915cfd90a9c3df66
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.14.2
