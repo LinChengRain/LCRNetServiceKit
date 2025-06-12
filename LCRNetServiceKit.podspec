@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'LCRNetServiceKit'
-  s.version          = '0.1.16'
+  s.version          = '0.1.17'
   s.summary          = '更新依赖库'
 
 # This description is used to generate tags and improve search results.
@@ -29,8 +29,8 @@ TODO: Add long description of the pod here.
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '12.0'
-  s.source_files = 'LCRNetServiceKit/Classes/**/*'
-  
+  s.source_files = 'Sources/Classes/**/*'
+  s.resource_bundles = {"LCRNetServiceKit" => ["Sources/PrivacyInfo.xcprivacy"]}
   s.swift_versions = '5.2'
   s.platform = :ios,'12.0'
   # s.resource_bundles = {

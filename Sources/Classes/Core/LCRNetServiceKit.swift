@@ -6,7 +6,7 @@
 //  Copyright © 2020 CocoaPods. All rights reserved.
 //
 
-import UIKit
+import Foundation
 import Alamofire
 import Reachability
 /// 宏定义请求成功的block

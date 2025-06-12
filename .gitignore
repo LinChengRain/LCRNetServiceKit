@@ -35,3 +35,6 @@ Carthage/Build
 # `pod install` in .travis.yml
 #
 Example/Pods/
+.build
+.swiftpm
+Package.resolved

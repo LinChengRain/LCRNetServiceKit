@@ -6,7 +6,7 @@
 //  Copyright © 2020 CocoaPods. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 enum LCRNetServiceError: Error {
     /// 普通的错误信息

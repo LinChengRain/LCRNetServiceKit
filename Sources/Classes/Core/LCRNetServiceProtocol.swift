@@ -5,7 +5,7 @@
 //  Created by apple on 2021/2/22.
 //
 
-import UIKit
+import Foundation
 
 /// API interface protocol
 public protocol LCRApiServiceProtocol {
