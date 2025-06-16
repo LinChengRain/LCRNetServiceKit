@@ -20,3 +20,10 @@ public protocol LCRApiServiceProtocol {
     /// Type representing HTTP methods.
     var method: LCRHttpRequestType { get }
 }
+
+public struct LCRMultipartForm {
+    var name: String
+    var fileName: String
+    var type: String
+    var data: Data
+}

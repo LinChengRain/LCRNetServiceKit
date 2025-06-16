@@ -13,6 +13,9 @@ import Reachability
 public typealias ResponseSuccess = (_ response: AnyObject) -> Void
 /// 宏定义请求失败的block
 public typealias ResponseFailure = (_ error: AnyObject) -> Void
+
+public typealias ResponseResult<Value> = (_ response: Value) -> Void
+
 /// 上传或者下载的进度
 public typealias ProgressResult =  (Double) -> Void//进度
 
@@ -24,10 +27,10 @@ public enum LCRNetServiceStatus: Int32 {
 }
 
 ///  网络请求的类型
-public enum LCRHttpRequestType {
-    case Get
-    case Post
-    case JsonPost
+public enum LCRHttpRequestType: String {
+    case Get = "GET"
+    case Post = "POST"
+    case Put = "PUT"
 }
 
 public class LCRNetServiceKit: NSObject {
@@ -136,7 +139,7 @@ extension LCRNetServiceKit{
             self.getRequest(headers,url: url, parameters: parameters, success: success, failure: failure)
         case .Post:
             self.postRequest(headers,url: url, parameters: parameters, success: success, failure: failure)
-        case .JsonPost:
+        default:
             self.postRequest(headers,url: url, parameters: parameters, success: success, failure: failure)
         }
     }
@@ -237,9 +240,50 @@ extension LCRNetServiceKit{
         }
     }
     
-    // MARK: - 处理响应
-    private func handleResponse(response:AFDataResponse<Any>,success:@escaping ResponseSuccess,failure:@escaping ResponseFailure){
+    
+    public func baseRequest<T:Codable>(config: LCRApiServiceProtocol, parameters: [String:Any]? = nil,success:@escaping ResponseResult<T>,failure: @escaping ResponseFailure) {
+        // 配置header
+        let  headers :HTTPHeaders? = signAndToken(config.header)
+        let method:HTTPMethod = HTTPMethod(rawValue: config.method.rawValue);
 
+        request = AF.request(config.url, method: method, parameters: parameters, headers: headers).responseDecodable(of:T.self,completionHandler: { (response:AFDataResponse<T>) in
+            print(response.debugDescription)
+            switch response.result {
+            case .success(let value):
+                success(value)
+            case .failure(let error):
+                failure(error as AnyObject)
+            }
+        })
+    }
+    
+    
+    public func uploadFile<T:Codable>(config: LCRApiServiceProtocol,parameters: [String:Any]? = nil, file:LCRMultipartForm, progressBlock:@escaping ProgressResult,success:@escaping ResponseResult<T>,failure: @escaping ResponseFailure){
+        
+        // 配置header
+        let  headers :HTTPHeaders? = signAndToken(config.header)
+        request = AF.upload(multipartFormData: { (multipartFormData) in
+            /** 采用post表单上传,参数解释：
+             *  withName:和后台服务器的name要一致;
+             *  fileName:可以充分利用写成用户的id，但是格式要写对;
+             *   mimeType：规定的，要上传其他格式可以自行百度查一下
+             */
+            multipartFormData.append(file.data, withName: file.name, fileName: file.fileName, mimeType: file.type);
+        }, to: config.url,headers: headers).uploadProgress { (progress) in
+//            print("Upload Progress: \(progress.fractionCompleted)")
+            progressBlock(progress.fractionCompleted);
+        }.responseDecodable(of:T.self,completionHandler: { (response:AFDataResponse<T>) in
+            switch response.result {
+            case .success(let value):
+                success(value)
+            case .failure(let error):
+                failure(error as AnyObject)
+            }
+        })
+    }
+    
+    // MARK: - 处理响应
+    private func handleResponse<T>(response:AFDataResponse<T>,success:@escaping ResponseSuccess,failure:@escaping ResponseFailure){
         switch response.result {
         case .success(let value):
             success(value as AnyObject)

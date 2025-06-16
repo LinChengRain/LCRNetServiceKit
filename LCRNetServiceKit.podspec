@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'LCRNetServiceKit'
-  s.version          = '0.1.17'
+  s.version          = '0.1.18'
   s.summary          = '更新依赖库'
 
 # This description is used to generate tags and improve search results.
